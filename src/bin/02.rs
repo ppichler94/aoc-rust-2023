@@ -5,13 +5,13 @@ advent_of_code::solution!(2);
 
 struct Game {
     id: u32,
-    sets: Vec<Set>
+    sets: Vec<Set>,
 }
 
 struct Set {
     red: u32,
     green: u32,
-    blue: u32
+    blue: u32,
 }
 
 impl ops::Add<Set> for Set {
@@ -20,7 +20,7 @@ impl ops::Add<Set> for Set {
         Set {
             red: self.red + rhs.red,
             green: self.green + rhs.green,
-            blue: self.blue + rhs.blue
+            blue: self.blue + rhs.blue,
         }
     }
 }
@@ -33,9 +33,9 @@ fn build_set(text: &str) -> Set {
         .map(|(a, b)| (b, a.parse::<u32>().unwrap()))
         .collect();
     Set {
-        red: *cubes.get("red").unwrap_or(&0u32),
+        red: *cubes.get("red").unwrap_or(&0),
         green: *cubes.get("green").unwrap_or(&0),
-        blue: *cubes.get("blue").unwrap_or(&0)
+        blue: *cubes.get("blue").unwrap_or(&0),
     }
 }
 
@@ -60,7 +60,7 @@ pub fn part_one(input: &str) -> Option<u32> {
         .filter(|game| game.sets.iter().all(|set| set.red <= 12 && set.green <= 13 && set.blue <= 14))
         .map(|game| game.id)
         .sum();
-    
+
     Some(result)
 }
 

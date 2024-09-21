@@ -6,13 +6,11 @@ pub fn part_one(input: &str) -> Option<u32> {
         .map(|line| {
             let mut chars = line.chars();
             let first = chars
-                .find(|char| { char.is_digit(10)})
-                .expect("line must contain a digit")
-                .to_digit(10)
+                .find_map(|char| { char.to_digit(10) })
                 .expect("line must contain a digit");
             let last = chars
-                .rfind(|char| { char.is_digit(10)})
-                .map(|char| { char.to_digit(10).unwrap() })
+                .rev()
+                .find_map(|char| { char.to_digit(10) })
                 .unwrap_or(first);
 
             last + 10 * first
@@ -53,9 +51,9 @@ fn to_number(text: &str) -> Option<u32> {
         ("nine", 9),
     ];
 
-    return mapping.iter()
+    mapping.iter()
         .find(|(word, _)| text.starts_with(word))
-        .map(|(_ ,v)| *v as u32);
+        .map(|(_, v)| *v as u32)
 }
 
 #[cfg(test)]

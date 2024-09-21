@@ -56,7 +56,7 @@ fn find_numbers(text: &str) -> Vec<Number> {
                 .char_indices()
                 .for_each(|(x, c)| {
                     if c.is_digit(10) {
-                        acc.push_str(c.to_string().as_str());
+                        acc.push_str(&c.to_string());
                         positions.push(Position { x, y })
                     }
                     if !c.is_digit(10) && !acc.is_empty() {

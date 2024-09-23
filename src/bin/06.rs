@@ -3,7 +3,7 @@ use itertools::Itertools;
 advent_of_code::solution!(6);
 
 pub fn part_one(input: &str) -> Option<u32> {
-    let (times_text, distances_text) = input.split_once("\n").unwrap();
+    let (times_text, distances_text) = input.split_once('\n').unwrap();
     let times = extract_values(times_text);
     let distances = extract_values(distances_text);
     let result = times.iter().zip(distances)
@@ -15,7 +15,7 @@ pub fn part_one(input: &str) -> Option<u32> {
 
 fn extract_values(text: &str) -> Vec<u64> {
     text
-        .split_once(":").unwrap().1
+        .split_once(':').unwrap().1
         .split_whitespace()
         .map(|it| it.parse().unwrap())
         .collect()
@@ -28,7 +28,7 @@ fn find_max_distance(time: u64, distance: u64) -> u32 {
 }
 
 pub fn part_two(input: &str) -> Option<u32> {
-    let (times_text, distances_text) = input.split_once("\n").unwrap();
+    let (times_text, distances_text) = input.split_once('\n').unwrap();
     let time = extract_value(times_text);
     let distance = extract_value(distances_text);
     Some(find_max_distance(time, distance))
@@ -36,7 +36,7 @@ pub fn part_two(input: &str) -> Option<u32> {
 
 fn extract_value(text: &str) -> u64 {
     text
-        .split_once(":").unwrap().1
+        .split_once(':').unwrap().1
         .split_whitespace()
         .join("")
         .parse().unwrap()

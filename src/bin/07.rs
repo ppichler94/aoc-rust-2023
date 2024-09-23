@@ -92,7 +92,7 @@ impl Hand {
         let jokers = counts.remove(&'J').unwrap_or(0);
         let high_card = *counts.iter().max_by_key(|(_, count)| **count).unwrap_or((&'x', &0)).0;
         let max_count = counts.remove(&high_card).unwrap_or(0);
-        let strength = match (max_count + jokers) {
+        let strength = match max_count + jokers {
             5 => 7,
             4 => 6,
             3 if counts.values().contains(&2) => 5,

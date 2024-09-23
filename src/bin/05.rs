@@ -40,26 +40,32 @@ impl Converter {
     }
 
     fn convert_range(&self, source: &Range<u64>) -> Vec<Range<u64>> {
-        let lut = self.luts.iter()
-            .find(|it| it.source_range().start <= source.end && source.start <= it.source_range().end);
-        if lut.is_none() {
-            return vec![source.clone()];
-        }
-
-        let start = cmp::max(source.start, lut.unwrap().source_range().start);
-        let end = cmp::min(source.end, lut.unwrap().source_range().end);
-        let dest_start = lut.unwrap().destination_start + (start - lut.unwrap().source_start);
-        let dest_end = dest_start + (end - start);
-
+        let mut input = vec![source.clone()];
         let mut result = Vec::new();
-        result.push(dest_start..dest_end);
-        if source.start < start {
-            result.push(source.start..start)
-        }
-        if end < source.end {
-            result.push(end..source.end)
-        }
 
+        self.luts.iter()
+            .for_each(|it| {
+                let tmp: Vec<_> = input.drain(..).collect();
+                tmp.iter().for_each(|range| {
+                    if it.source_range().start <= range.end && range.start <= it.source_range().end {
+                        let start = cmp::max(range.start, it.source_range().start);
+                        let end = cmp::min(range.end, it.source_range().end);
+                        let dest_start = it.destination_start + (start - it.source_start);
+                        let dest_end = dest_start + (end - start);
+                        result.push(dest_start..dest_end);
+                        if range.start < start {
+                            input.push(range.start..start)
+                        }
+                        if end < range.end {
+                            input.push(end..range.end)
+                        }
+                    } else {
+                        input.push(range.clone())
+                    }
+                })
+            });
+
+        result.append(&mut input);
         result
     }
 

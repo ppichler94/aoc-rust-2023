@@ -28,14 +28,14 @@ struct Converter {
 impl Converter {
     fn convert(&self, source: &u64) -> u64 {
         let lut = self.luts.iter()
-            .find(|it| it.source_range().contains(&source));
+            .find(|it| it.source_range().contains(source));
         if lut.is_none() {
             return *source;
         }
         lut.unwrap().destination_start + (source - lut.unwrap().source_start)
     }
 
-    fn convert_ranges(&self, source: &Vec<Range<u64>>) -> Vec<Range<u64>> {
+    fn convert_ranges(&self, source: &[Range<u64>]) -> Vec<Range<u64>> {
         source.iter().flat_map(|it| self.convert_range(it)).collect()
     }
 
@@ -45,7 +45,7 @@ impl Converter {
 
         self.luts.iter()
             .for_each(|it| {
-                let tmp: Vec<_> = input.drain(..).collect();
+                let tmp: Vec<_> = std::mem::take(&mut input);
                 tmp.iter().for_each(|range| {
                     if it.source_range().start <= range.end && range.start <= it.source_range().end {
                         let start = cmp::max(range.start, it.source_range().start);
@@ -89,7 +89,7 @@ fn parse_input(input: &str) -> (Vec<u64>, HashMap<String, Converter>) {
     let (_, seeds_text) = parts[0].split_once(": ").unwrap();
     let seeds: Vec<_> = seeds_text.split_whitespace().map(|it| it.parse::<u64>().unwrap()).collect();
     let converters: HashMap<_, _> = parts.iter().dropping(1)
-        .map(|it| Converter::parse(*it))
+        .map(|it| Converter::parse(it))
         .collect();
     (seeds, converters)
 }
@@ -108,7 +108,7 @@ fn convert_to_location(seed: &u64, converters: &HashMap<String, Converter>) -> u
 
     while category != "location" {
         number = converters[&category].convert(&number);
-        category = converters[&category].destination.clone();
+        category.clone_from(&converters[&category].destination);
     }
 
     number
@@ -130,7 +130,7 @@ fn convert_range_to_location(seed: Range<u64>, converters: &HashMap<String, Conv
 
     while category != "location" {
         number = converters[&category].convert_ranges(&number);
-        category = converters[&category].destination.clone();
+        category.clone_from(&converters[&category].destination);
     }
 
     number.iter().map(|it| it.start).min().unwrap()

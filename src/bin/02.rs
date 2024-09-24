@@ -28,8 +28,8 @@ impl ops::Add<Set> for Set {
 fn build_set(text: &str) -> Set {
     let cubes: HashMap<_, _> = text
         .trim()
-        .split(",")
-        .map(|it| it.trim().split_once(" ").unwrap())
+        .split(',')
+        .map(|it| it.trim().split_once(' ').unwrap())
         .map(|(a, b)| (b, a.parse::<u32>().unwrap()))
         .collect();
     Set {
@@ -43,10 +43,10 @@ fn build_games(text: &str) -> Vec<Game> {
     text
         .lines()
         .map(|line| {
-            let (game, rest) = line.split_once(":").unwrap();
-            let (_, id) = game.split_once(" ").unwrap();
+            let (game, rest) = line.split_once(':').unwrap();
+            let (_, id) = game.split_once(' ').unwrap();
             let sets = rest
-                .split(";")
+                .split(';')
                 .map(build_set)
                 .collect();
             Game { id: id.parse().unwrap(), sets }

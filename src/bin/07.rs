@@ -32,8 +32,8 @@ impl Ord for Hand {
         let difference = self.cards.chars().zip(other.cards.chars())
             .find(|(a, b)| a != b);
 
-        if difference.is_some() {
-            return Ord::cmp(&self.card_values[&difference.unwrap().0], &self.card_values[&difference.unwrap().1]);
+        if let Some(value) = difference {
+            return Ord::cmp(&self.card_values[&value.0], &self.card_values[&value.1]);
         }
 
         Ordering::Equal
@@ -44,7 +44,7 @@ impl Eq for Hand {}
 
 impl Hand {
     fn from_line1(line: &str) -> Hand {
-        let (cards, bid) = line.split_once(" ").unwrap();
+        let (cards, bid) = line.split_once(' ').unwrap();
         let mut counts: HashMap<_, _> = cards.chars()
             .sorted()
             .chunk_by(|it| *it)
@@ -82,7 +82,7 @@ impl Hand {
     }
 
     fn from_line2(line: &str) -> Hand {
-        let (cards, bid) = line.split_once(" ").unwrap();
+        let (cards, bid) = line.split_once(' ').unwrap();
         let mut counts: HashMap<_, _> = cards.chars()
             .sorted()
             .chunk_by(|it| *it)

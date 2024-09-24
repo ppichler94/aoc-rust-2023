@@ -39,7 +39,7 @@ struct Number {
     neighbors: HashSet<Position>,
 }
 
-fn build_number(value: u32, positions: &Vec<Position>) -> Number {
+fn build_number(value: u32, positions: &[Position]) -> Number {
     let neighbors = positions.iter().flat_map(|it| it.neighbors()).collect();
     Number { value, neighbors }
 }
@@ -55,11 +55,11 @@ fn find_numbers(text: &str) -> Vec<Number> {
             line
                 .char_indices()
                 .for_each(|(x, c)| {
-                    if c.is_digit(10) {
+                    if c.is_ascii_digit() {
                         acc.push_str(&c.to_string());
                         positions.push(Position { x, y })
                     }
-                    if !c.is_digit(10) && !acc.is_empty() {
+                    if !c.is_ascii_digit() && !acc.is_empty() {
                         numbers.push(build_number(acc.parse().unwrap(), &positions));
                         acc.clear();
                         positions.clear()
@@ -85,7 +85,7 @@ pub fn part_one(input: &str) -> Option<u32> {
             line
                 .char_indices()
                 .for_each(|(x, c)| {
-                    if !c.is_digit(10) && c != '.' {
+                    if !c.is_ascii_digit() && c != '.' {
                         symbols.insert(Position { x, y });
                     }
                 });

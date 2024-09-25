@@ -8,7 +8,7 @@ advent_of_code::solution!(8);
 pub fn part_one(input: &str) -> Option<u32> {
     let (instructions, route_map) = parse_input(input);
 
-    Some(count_steps("AAA", &instructions, &route_map))
+    Some(count_steps("AAA", instructions, &route_map))
 }
 
 fn parse_input(input: &str) -> (&str, HashMap<&str, (&str, &str)>) {
@@ -38,8 +38,8 @@ pub fn part_two(input: &str) -> Option<u32> {
 
     let result = route_map.keys()
         .filter(|it| it.ends_with('A'))
-        .map(|it| count_steps(it, &instructions, &route_map) as u64)
-        .reduce(|prev, next| lcm(prev, next))
+        .map(|it| count_steps(it, instructions, &route_map) as u64)
+        .reduce(lcm)
         .unwrap();
 
     Some(result as u32)

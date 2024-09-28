@@ -1,37 +1,8 @@
+use advent_of_code::util::position::Position;
 use itertools::Itertools;
 use std::collections::HashSet;
 
 advent_of_code::solution!(3);
-
-#[derive(Hash, Eq, PartialEq, Debug, Clone, Copy, Ord, PartialOrd)]
-struct Position {
-    x: usize,
-    y: usize,
-}
-
-impl Position {
-    fn neighbors(&self) -> HashSet<Position> {
-        let mut result = HashSet::new();
-        if self.x > 0 {
-            result.insert(Position { x: self.x - 1, y: self.y });
-            result.insert(Position { x: self.x - 1, y: self.y + 1 });
-        }
-
-        if self.y > 0 {
-            result.insert(Position { x: self.x, y: self.y - 1 });
-            result.insert(Position { x: self.x + 1, y: self.y - 1 });
-        }
-
-        if self.x > 0 && self.y > 0 {
-            result.insert(Position { x: self.x - 1, y: self.y - 1 });
-        }
-        result.insert(Position { x: self.x, y: self.y });
-        result.insert(Position { x: self.x + 1, y: self.y });
-        result.insert(Position { x: self.x, y: self.y + 1 });
-        result.insert(Position { x: self.x + 1, y: self.y + 1 });
-        result
-    }
-}
 
 #[derive(Eq, PartialEq, Debug)]
 struct Number {
@@ -40,7 +11,7 @@ struct Number {
 }
 
 fn build_number(value: u32, positions: &[Position]) -> Number {
-    let neighbors = positions.iter().flat_map(|it| it.neighbors()).collect();
+    let neighbors = positions.iter().flat_map(|it| it.neighbors(Position::moves(true, false))).collect();
     Number { value, neighbors }
 }
 
@@ -57,7 +28,7 @@ fn find_numbers(text: &str) -> Vec<Number> {
                 .for_each(|(x, c)| {
                     if c.is_ascii_digit() {
                         acc.push(c);
-                        positions.push(Position { x, y })
+                        positions.push(Position::from((x, y)))
                     }
                     if !c.is_ascii_digit() && !acc.is_empty() {
                         numbers.push(build_number(acc.parse().unwrap(), &positions));
@@ -86,7 +57,7 @@ pub fn part_one(input: &str) -> Option<u32> {
                 .char_indices()
                 .for_each(|(x, c)| {
                     if !c.is_ascii_digit() && c != '.' {
-                        symbols.insert(Position { x, y });
+                        symbols.insert(Position::from((x, y)));
                     }
                 });
         });
@@ -110,7 +81,7 @@ pub fn part_two(input: &str) -> Option<u32> {
                 .char_indices()
                 .for_each(|(x, c)| {
                     if c == '*' {
-                        gears.insert(Position { x, y });
+                        gears.insert(Position::from((x, y)));
                     }
                 });
         });

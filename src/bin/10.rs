@@ -1,3 +1,4 @@
+use advent_of_code::util::grid2d::Grid2d;
 use advent_of_code::util::position::Position;
 use std::collections::{HashSet, VecDeque};
 
@@ -8,7 +9,7 @@ const SOUTH: Position = Position { x: 0, y: 1 };
 const EAST: Position = Position { x: 1, y: 0 };
 const WEST: Position = Position { x: -1, y: 0 };
 
-type Map = Vec<Vec<char>>;
+type Map = Grid2d<char>;
 
 fn movement(tile: char, direction: Position) -> Option<Position> {
     match (tile, direction) {
@@ -41,7 +42,7 @@ fn traverse_pipe(map: &mut Map, start: Position, width: usize, height: usize, pr
         .filter(|it| it.is_safe(width as i64, height as i64))
         .find(|&pos| {
             let dir = pos - start;
-            movement(map[pos.y as usize][pos.x as usize], dir).is_some()
+            movement(map.get(&pos), dir).is_some()
         }).unwrap();
 
     let mut direction = current - start;
@@ -49,7 +50,7 @@ fn traverse_pipe(map: &mut Map, start: Position, width: usize, height: usize, pr
     pipe.insert(start);
     while current != start {
         pipe.insert(current);
-        let tile = map[current.y as usize][current.x as usize];
+        let tile = map.get(&current);
         let next_direction = movement(tile, direction).expect("Invalid movement");
         pre_move(&current, &direction, &next_direction, map);
         direction = next_direction;
@@ -61,9 +62,7 @@ fn traverse_pipe(map: &mut Map, start: Position, width: usize, height: usize, pr
 fn parse_map(input: &str) -> (usize, usize, Position, Map) {
     let width = input.lines().next().unwrap().len();
     let height = input.lines().count();
-    let map: Map = input.lines()
-        .map(|it| it.chars().collect())
-        .collect();
+    let map = Map::of_lines(input);
     let start_index = input.find('S').unwrap();
     let start_x = start_index % (width + 1); // add +1 to account for newlines
     let start_y = start_index / (width + 1);
@@ -75,33 +74,34 @@ pub fn part_two(input: &str) -> Option<u32> {
     let (width, height, start, mut map) = parse_map(input);
 
     let pipe = traverse_pipe(&mut map, start, width, height, &|_, _, _, _| {});
-    map.iter_mut()
-        .enumerate()
-        .for_each(|(y, row)| {
-            row.iter_mut()
-                .enumerate()
-                .for_each(|(x, c)| {
-                    let pos = Position::from((x, y));
-                    if !pipe.contains(&pos) {
-                        *c = '.'
-                    }
-                })
-        });
+    for y in 0..height {
+        for x in 0..width {
+            let pos = Position::from((x, y));
+            if !pipe.contains(&pos) {
+                map.set(&pos, '.');
+            }
+        }
+    }
 
-    let empty_corner = vec![Position::at(0, 0), Position::at(0, (height - 1) as i64), Position::at((width - 1) as i64, 0), Position::at(width as i64, height as i64)]
-        .into_iter().find(|it| map[it.y as usize][it.x as usize] == '.')
+    let empty_corner = vec![
+        Position::from((0, 0)),
+        Position::from((0, height - 1)),
+        Position::from((width - 1, 0)),
+        Position::from((width, height))
+    ]
+        .into_iter().find(|it| map.get(it) == '.')
         .unwrap();
 
     let corners = HashSet::from(['7', 'L', 'J', 'F']);
     traverse_pipe(&mut map, start, width, height, &|pos, dir, next_dir, map| {
         fill_area(map, *pos + marking_direction(*dir), 'O', width as i64, height as i64);
-        if corners.contains(&map[pos.y as usize][pos.x as usize]) {
+        if corners.contains(&map.get(pos)) {
             fill_area(map, *pos + marking_direction(*next_dir), 'O', width as i64, height as i64);
         }
     });
 
-    let target = if map[empty_corner.y as usize][empty_corner.x as usize] == 'O' { '.' } else { 'O' };
-    Some(map.iter().flatten().filter(|c| **c == target).count() as u32)
+    let target = if map.get(&empty_corner) == 'O' { '.' } else { 'O' };
+    Some(map.find_all(target).len() as u32)
 }
 
 fn marking_direction(dir: Position) -> Position {
@@ -126,8 +126,8 @@ fn fill_area(map: &mut Map, pos: Position, c: char, width: i64, height: i64) {
         if !next.is_safe(width, height) {
             continue;
         }
-        if map[next.y as usize][next.x as usize] == '.' {
-            map[next.y as usize][next.x as usize] = c;
+        if map.get(&next) == '.' {
+            map.set(&next, c);
             queue.extend(next.neighbors(Position::moves(false, false)));
         }
     }

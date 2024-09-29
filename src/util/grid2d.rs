@@ -6,6 +6,8 @@ pub struct Grid2d<T> {
 }
 
 impl<T: Copy + PartialEq> Grid2d<T> {
+    /// Returns the dimensions of the grid as `(width, height)`.
+    ///
     pub fn size(&self) -> (usize, usize) {
         (self.content.len(), self.content[0].len())
     }
@@ -18,10 +20,15 @@ impl<T: Copy + PartialEq> Grid2d<T> {
         self.content[position.y as usize][position.x as usize] = data
     }
 
+    /// Creates a grid from a string by splitting the string into lines and
+    /// then splitting the lines into characters.
+    /// Each line must be of equal length.
+    ///
     pub fn of_lines(text: &str) -> Grid2d<char> {
         Grid2d { content: text.lines().map(|line| line.chars().collect()).collect() }
     }
 
+    /// Returns the positions for all occurrences of the `target`.
     pub fn find_all(&self, target: T) -> Vec<Position> {
         let mut result = Vec::new();
         self.content.iter()

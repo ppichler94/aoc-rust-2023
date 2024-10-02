@@ -1,13 +1,8 @@
 use advent_of_code::util::grid2d::Grid2d;
-use advent_of_code::util::position::Position;
+use advent_of_code::util::position::{Position, EAST, NORTH, SOUTH, WEST};
 use std::collections::{HashSet, VecDeque};
 
 advent_of_code::solution!(10);
-
-const NORTH: Position = Position { x: 0, y: -1 };
-const SOUTH: Position = Position { x: 0, y: 1 };
-const EAST: Position = Position { x: 1, y: 0 };
-const WEST: Position = Position { x: -1, y: 0 };
 
 type Map = Grid2d<char>;
 

@@ -1,3 +1,4 @@
+use crate::util::grid2d::Grid2d;
 use std::ops::{Add, Sub};
 
 #[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug)]
@@ -5,6 +6,11 @@ pub struct Position {
     pub x: i64,
     pub y: i64,
 }
+
+pub const NORTH: Position = Position { x: 0, y: -1 };
+pub const SOUTH: Position = Position { x: 0, y: 1 };
+pub const EAST: Position = Position { x: 1, y: 0 };
+pub const WEST: Position = Position { x: -1, y: 0 };
 
 impl From<(usize, usize)> for Position {
     fn from(value: (usize, usize)) -> Self {
@@ -84,6 +90,11 @@ impl Position {
     ///
     pub fn is_safe(&self, width: i64, height: i64) -> bool {
         self.x >= 0 && self.y >= 0 && self.x < width && self.y < height
+    }
+
+    pub fn is_within<T>(&self, grid: &Grid2d<T>) -> bool {
+        let (width, height) = grid.size();
+        self.is_safe(width as i64, height as i64)
     }
 }
 

@@ -19,7 +19,7 @@ impl<T> Grid2d<T> {
     /// Returns the dimensions of the grid as `(width, height)`.
     ///
     pub fn size(&self) -> (usize, usize) {
-        (self.content.len(), self.content[0].len())
+        (self.content[0].len(), self.content.len())
     }
 }
 

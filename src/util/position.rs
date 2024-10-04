@@ -1,5 +1,5 @@
 use crate::util::grid2d::Grid2d;
-use std::ops::{Add, Sub};
+use std::ops::{Add, Mul, Sub};
 
 #[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug)]
 pub struct Position {
@@ -127,5 +127,21 @@ impl Sub for Position {
 
     fn sub(self, rhs: Self) -> Self::Output {
         Position { x: self.x - rhs.x, y: self.y - rhs.y }
+    }
+}
+
+impl Mul<i64> for Position {
+    type Output = Position;
+
+    fn mul(self, rhs: i64) -> Self::Output {
+        Position { x: self.x * rhs, y: self.y * rhs }
+    }
+}
+
+impl Mul<i64> for &Position {
+    type Output = Position;
+
+    fn mul(self, rhs: i64) -> Self::Output {
+        Position { x: self.x * rhs, y: self.y * rhs }
     }
 }

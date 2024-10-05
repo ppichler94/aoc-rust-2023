@@ -66,13 +66,15 @@ pub fn part_two(input: &str) -> Option<u32> {
                 let (label, focal_length) = step.split_once('=').unwrap();
                 let focal_length: u32 = focal_length.parse().unwrap();
                 let number = hash(label);
-                let entry = boxes.entry(number).or_insert(Box::at(number));
-                entry.insert_lens(label, focal_length);
+                boxes.entry(number)
+                    .or_insert(Box::at(number))
+                    .insert_lens(label, focal_length);
             } else {
                 let label = step.trim_end_matches("-");
                 let number = hash(label);
-                let entry = boxes.entry(number).or_insert(Box::at(number));
-                entry.remove_lens(label);
+                boxes.entry(number)
+                    .or_insert(Box::at(number))
+                    .remove_lens(label);
             }
         });
 

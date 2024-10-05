@@ -6,20 +6,27 @@ advent_of_code::solution!(17);
 
 pub fn part_one(input: &str) -> Option<u32> {
     let grid = Grid2d::of_lines(input);
-    let (width, height) = grid.size();
-    let goal = Position::from((width - 1, height - 1));
-    let start1 = State { position: Position::from((0, 0)), direction: EAST, steps: 1 };
-    let start2 = State { position: Position::from((0, 0)), direction: SOUTH, steps: 1 };
-    let result = dijkstra(&start1, |state| state.successor(&grid, |next_dir, dir, steps| next_dir == dir && steps >= 3), |state| state.position == goal);
-    let loss1 = result.map(|(_, it)| it);
-    let result = dijkstra(&start2, |state| state.successor(&grid, |next_dir, dir, steps| next_dir == dir && steps >= 3), |state| state.position == goal);
-    let loss2 = result.map(|(_, it)| it);
-
-    let result = loss1.min(loss2).unwrap();
-    Some(result)
+    let heat_loss = find_heat_loss(
+        &grid,
+        0,
+        &|next_dir, dir, steps| next_dir == dir && steps >= 3,
+    );
+    Some(heat_loss)
 }
 
-#[derive(Eq, PartialEq, Hash, Clone)]
+fn find_heat_loss(grid: &Grid2d<char>, min_steps: u32, filter: &dyn Fn(Position, Position, u32) -> bool) -> u32 {
+    let (width, height) = grid.size();
+    let goal = Position::from((width - 1, height - 1));
+    let start = State { position: Position::from((0, 0)), direction: EAST, steps: 1 };
+    let result = dijkstra(&start, |state| state.successor(&grid, filter), |state| state.position == goal && state.steps > min_steps);
+    let loss1 = result.map(|(_, it)| it);
+    let start = State { position: Position::from((0, 0)), direction: SOUTH, steps: 1 };
+    let result = dijkstra(&start, |state| state.successor(&grid, filter), |state| state.position == goal && state.steps > min_steps);
+    let loss2 = result.map(|(_, it)| it);
+    loss1.min(loss2).unwrap()
+}
+
+#[derive(Eq, PartialEq, Hash, Clone, Copy)]
 struct State {
     position: Position,
     direction: Position,
@@ -68,21 +75,12 @@ fn directions(direction: &Position) -> Vec<Position> {
 
 pub fn part_two(input: &str) -> Option<u32> {
     let grid = Grid2d::of_lines(input);
-    let (width, height) = grid.size();
-    let goal = Position::from((width - 1, height - 1));
-    let start1 = State { position: Position::from((0, 0)), direction: EAST, steps: 1 };
-    let start2 = State { position: Position::from((0, 0)), direction: SOUTH, steps: 1 };
-    let result = dijkstra(&start1,
-                          |state| state.successor(&grid, |next_dir, dir, steps| (next_dir != dir && steps <= 3) || (next_dir == dir && steps > 9)),
-                          |state| state.position == goal && state.steps > 3);
-    let loss1 = result.map(|(_, it)| it);
-    let result = dijkstra(&start2,
-                          |state| state.successor(&grid, |next_dir, dir, steps| (next_dir != dir && steps <= 3) || (next_dir == dir && steps > 9)),
-                          |state| state.position == goal && state.steps > 3);
-    let loss2 = result.map(|(_, it)| it);
-
-    let result = loss1.min(loss2).unwrap();
-    Some(result)
+    let heat_loss = find_heat_loss(
+        &grid,
+        3,
+        &|next_dir, dir, steps| (next_dir != dir && steps <= 3) || (next_dir == dir && steps > 9),
+    );
+    Some(heat_loss)
 }
 
 #[cfg(test)]

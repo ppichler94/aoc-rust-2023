@@ -62,6 +62,13 @@ impl Position {
         result
     }
 
+    pub fn neighbors_wrap<T>(&self, moves: Vec<Position>, grid: &Grid2d<T>) -> Vec<Position> {
+        let (width, height) = grid.size();
+        moves.into_iter()
+            .map(|it| (self + &it).wrap_to_limits(width as i64, height as i64))
+            .collect()
+    }
+
     /// Returns the neighbors of this position by applying the given moves.
     /// Neighbors with coordinates < 0 are filtered out.
     /// The function [`Position::moves`] can be used to generate the moves.
@@ -70,9 +77,7 @@ impl Position {
         let mut result = Vec::new();
         for mv in moves {
             let new_pos = self + &mv;
-            if new_pos.x >= 0 && new_pos.y >= 0 {
-                result.push(new_pos);
-            }
+            result.push(new_pos);
         }
         result
     }
@@ -95,6 +100,10 @@ impl Position {
     pub fn is_within<T>(&self, grid: &Grid2d<T>) -> bool {
         let (width, height) = grid.size();
         self.is_safe(width as i64, height as i64)
+    }
+
+    pub fn wrap_to_limits(&self, width: i64, height: i64) -> Self {
+        Position { x: self.x.rem_euclid(width), y: self.y.rem_euclid(height) }
     }
 }
 

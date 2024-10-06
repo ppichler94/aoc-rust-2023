@@ -18,10 +18,10 @@ fn find_heat_loss(grid: &Grid2d<char>, min_steps: u32, filter: &dyn Fn(Position,
     let (width, height) = grid.size();
     let goal = Position::from((width - 1, height - 1));
     let start = State { position: Position::from((0, 0)), direction: EAST, steps: 1 };
-    let result = dijkstra(&start, |state| state.successor(&grid, filter), |state| state.position == goal && state.steps > min_steps);
+    let result = dijkstra(&start, |state| state.successor(grid, filter), |state| state.position == goal && state.steps > min_steps);
     let loss1 = result.map(|(_, it)| it);
     let start = State { position: Position::from((0, 0)), direction: SOUTH, steps: 1 };
-    let result = dijkstra(&start, |state| state.successor(&grid, filter), |state| state.position == goal && state.steps > min_steps);
+    let result = dijkstra(&start, |state| state.successor(grid, filter), |state| state.position == goal && state.steps > min_steps);
     let loss2 = result.map(|(_, it)| it);
     loss1.min(loss2).unwrap()
 }

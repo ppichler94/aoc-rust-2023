@@ -1,4 +1,5 @@
 use crate::util::position::Position;
+use std::fmt::{Display, Formatter};
 
 #[derive(Eq, PartialEq, Hash, Debug)]
 pub struct Grid2d<T> {
@@ -25,6 +26,12 @@ impl<T> Grid2d<T> {
 
 impl<T: Copy + PartialEq> Grid2d<T> {
     pub fn get(&self, position: &Position) -> T {
+        self.content[position.y as usize][position.x as usize]
+    }
+
+    pub fn get_wrap(&self, position: &Position) -> T {
+        let (width, height) = self.size();
+        let position = position.wrap_to_limits(width as i64, height as i64);
         self.content[position.y as usize][position.x as usize]
     }
 
@@ -56,6 +63,17 @@ impl<T: Copy + PartialEq> Grid2d<T> {
         result
     }
 
+    pub fn find_first(&self, target: T) -> Option<Position> {
+        for (y, row) in self.content.iter().enumerate() {
+            for (x, &data) in row.iter().enumerate() {
+                if data == target {
+                    return Some(Position::from((x, y)));
+                }
+            }
+        }
+        None
+    }
+
     pub fn for_each<F>(&self, f: F)
     where
         F: Fn(usize, usize, T),
@@ -65,5 +83,17 @@ impl<T: Copy + PartialEq> Grid2d<T> {
                 f(j, i, item);
             }
         }
+    }
+}
+
+impl<T: Display> Display for Grid2d<T> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        for row in self.content.iter() {
+            for item in row.iter() {
+                write!(f, "{}", item)?;
+            }
+            f.write_str("\n")?;
+        }
+        Ok(())
     }
 }
